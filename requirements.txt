@@ -1,0 +1,3 @@
+Click==7.0
+liac-arff==2.4.0
+pympi-ling==1.69
