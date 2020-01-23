@@ -89,6 +89,7 @@ def combine_textgrid_data(
             i for i, a in enumerate(arff_attributes) 
             if a[0] in PROBLEMATIC_ATTRS
         ]
+        # word is a tuple of mintime, maxtime, and the word
         for word in words:
             if word[-1]!='':
                 counter += 1
@@ -97,7 +98,16 @@ def combine_textgrid_data(
                 boundary = next((
                     t[1] for t in tones if t[0]==word[0] or t[0]==word[1]), None)
                 if tone:
-                    intonations.add(tone)
+                    if '%' in tone:
+                        # % is a boundary sign
+                        boundary = tone
+                        tone = None
+                        feature_row.append('unaccented')
+                    else:
+                        intonations.add(tone)
+                        feature_row.append('accented')
+                else:
+                    feature_row.append('unaccented')
                 if boundary:
                     boundaries.add(boundary)
                 feature_row.append(boundary) # add boundary, second to last column
@@ -114,6 +124,7 @@ def combine_textgrid_data(
     arff_output = arff.load(open(arff_files[0], 'r'))
     output_attrs = arff_output['attributes']
     output_attrs.extend([
+        ('accent', ['accented', 'unaccented']),
         ('boundary', list(boundaries)),
         ('tone', list(intonations))
     ])
@@ -160,7 +171,7 @@ def main(source_arff_dir, textgrid_dir, cleaned_arff_dir, output_file):
     parse_files(source_arff_dir, cleaned_arff_dir)
     combine_textgrid_data(textgrid_dir, cleaned_arff_dir, output_file)
     out_nostring = "{}_nostring.{}".format(*output_file.split("."))
-    combine_textgrid_data(textgrid_dir, cleaned_arff_dir, out_nostring)
+    combine_textgrid_data(textgrid_dir, cleaned_arff_dir, out_nostring, suppress_strings=True)
 
 
 if __name__ == '__main__':
