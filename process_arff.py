@@ -70,12 +70,23 @@ def combine_textgrid_data(
     all_data = []
     for tg in textgrid_files:
         counter = -1
-        tg_data = pympi.Praat.TextGrid(tg)
         try:
-            words = tg_data.get_tier('segment').get_all_intervals()
-            tones = tg_data.get_tier('intonation').get_all_intervals()
+            tg_data = pympi.Praat.TextGrid(tg)
+        except:
+            print(tg)
+            continue
+        try:
+            words = tg_data.get_tier('words').get_all_intervals()
+            breaks = tg_data.get_tier('Break').get_all_intervals()
         except Exception as e:
             continue
+        if len(list(tg_data.get_tier_name_num()))>2:
+            try:
+                tone = tg_data.get_tier('PitchAccent').get_all_intervals()[0]
+            except Exception as e:
+                continue
+        else:
+            tone = None
         arff_file = next((
             af for af in arff_files if op.split(af)[1].startswith(
                 op.splitext(op.split(tg)[1])[0]
@@ -90,28 +101,23 @@ def combine_textgrid_data(
             if a[0] in PROBLEMATIC_ATTRS
         ]
         # word is a tuple of mintime, maxtime, and the word
-        for word in words:
+        for index, word in enumerate(words):
             if word[-1]!='':
                 counter += 1
-                feature_row = arff_data['data'][counter]
-                tone = next((t[1] for t in tones if t[0]>word[0] and t[0]<word[1]), None)
-                boundary = next((
-                    t[1] for t in tones if t[0]==word[0] or t[0]==word[1]), None)
-                if tone:
-                    if '%' in tone:
-                        # % is a boundary sign
-                        boundary = tone
-                        tone = None
-                        feature_row.append('unaccented')
-                    else:
-                        intonations.add(tone)
-                        feature_row.append('accented')
+                try:
+                    feature_row = arff_data['data'][counter]
+                except:
+                    print(arff_file)
+                    continue
+                boundary = breaks[index][2]
+                if boundary=='':
+                    boundary = '#0'
+                boundaries.add(boundary) 
+                if tone and word[0]<tone[0]<word[1]:
+                    feature_row.extend(['accented', boundary, tone[1]])
+                    intonations.add(tone[1])
                 else:
-                    feature_row.append('unaccented')
-                if boundary:
-                    boundaries.add(boundary)
-                feature_row.append(boundary) # add boundary, second to last column
-                feature_row.append(tone) # add tone, as last column
+                    feature_row.extend(['unaccented', boundary, None])
                 if not suppress_strings:
                     feature_row.append(op.split(tg)[1]) # add filename
                     feature_row.append(word[-1]) # add word in question

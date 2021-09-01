@@ -1,2 +1,4 @@
 *.arff
+*.zip
+*.pkl
 __pycache__
