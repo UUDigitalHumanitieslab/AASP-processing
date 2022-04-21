@@ -15,6 +15,7 @@ def train_model(infile):
     df_tone = df.loc[df['accent'] == 'accented']
     y_tone = df_tone['tone'].str.decode('utf-8')
     X_tone = df_tone.iloc[:, :-3]
+    # split datasets into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X_tone, y_tone)
     # Random Forest Classifier:
     # 0.87 precision / 0.7 recall for accent detection (can use n_estimators=20)
