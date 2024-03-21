@@ -1,0 +1,27 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AASP-processing
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: 'Research Software Lab, Centre for Digital Humanities, Utrecht University'
+    website: 'https://cdh.uu.nl/centre-for-digital-humanities/research-software-lab/'
+    city: Utrecht
+    country: NL
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.10849705
+repository-code: 'https://github.com/UUDigitalHumanitieslab/aasp-processing'
+abstract: >-
+  This reposistory contains scripts to train speech prosody classifiers, to be used in the Automatic Analysis of Speech Prosody application. The scripts collected here can be used to use audio features extracted with the speech prosody analysis tool AuToBI to predict human annotations in .TextGrid format.
+keywords:
+  - speech
+  - prosody
+  - classification
+license: BSD-3-Clause
+version: 0.0.1
+date-released: '2024-03-21'
